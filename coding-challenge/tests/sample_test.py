@@ -12,8 +12,7 @@ import subprocess
 from dataclasses import dataclass
 from typing import Iterable
 
-ENTRY_POINT = "./tetris"
-
+ENTRY_POINT = "./dist/tetris"
 
 @dataclass
 class TestCase:

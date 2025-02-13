@@ -156,3 +156,47 @@ The solution will be evaluated on the following criteria:
 - **Algorithmic complexity**: how does the performance of the submission scale with
   regards to its input
 - **Efficiency**: how efficient is the solution. Our test suite includes test cases that might not fit entirely into memory. The solution is expected to handle multi-gigabyte inputs without running itself out of memory.
+
+## Setup
+
+Create a virtual environment activate it:
+```bash
+python -m venv .venv
+source .venv/bin/activate
+```
+
+The virtual environment must stay activated for the rest of the commands to work.
+
+Install the dependencies:
+```bash
+pip install -r requirements.txt
+```
+
+Build the executable:
+```bash
+pyinstaller --onefile --name tetris tetris.py
+```
+...when finished, the executable can be found in `dist/tetris.exe`
+
+In `tests/sample_test.py`, ENTRY_POINT should therefore be set to 
+```python
+ENTRY_POINT = "./dist/tetris"
+```
+
+### Notes:
+
+If on Windows, activate the virtual environment by running:
+```shell
+.venv\Scripts\activate
+```
+
+I personally developed and tested this solution on Windows using...
+```python
+    p = subprocess.run(
+        ["cmd.exe", "/c", "dist/tetris.exe"],
+        input=test_case.sample_input,
+        capture_output=True,
+    )
+```
+
+...so if you are using Linux or Mac and something doesn't work properly, you will need to modify the `ENTRY_POINT` in `tests/sample_test.py` accordingly.
