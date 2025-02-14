@@ -31,6 +31,11 @@ def tetris(input_line: str) -> int:
     Tetrises the input sequence of pieces.
     Returns the filled height of the grid.
     """
+
+    # If the input line is empty (meaning no block placed), return 0.
+    if not input_line:
+        return 0
+
     grid = TetrisGrid()
     
     for piece in input_line.split(','):
@@ -41,10 +46,20 @@ def tetris(input_line: str) -> int:
     return grid.get_block_height()
 
 def main():
-    input_line = sys.stdin.readline().strip()
-    result = tetris(input_line)
-    sys.stdout.write(str(result))
-    sys.exit(0)
+    try:
+        for line in sys.stdin:
+            line = line.strip()
+            result = tetris(line)
+            sys.stdout.write(str(result) + "\n")
+    except EOFError:
+        sys.stdout.write("EOF detected, exitting from program...")
+        sys.exit(0)
+    except Exception as e:
+        # Under Windows, I couldn't find a way to detect EOFError.
+        # So, I just catch all exceptions to exit somewhat gracefully.
+        sys.stdout.write("Exception: " + str(e) + "\n")
+        sys.stdout.write("Exitting from program...")
+        sys.exit(0)
 
 
 if __name__ == "__main__":
