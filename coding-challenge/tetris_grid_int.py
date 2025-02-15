@@ -1,25 +1,28 @@
 from typing import List, Tuple
-from blocks import Block
-
+from blocks import IntBlock
 
 class TetrisGridInt:
     grid: List[int]
 
+    _full_row: int
+    _width: int
+    _bitmask_by_column: List[int]
+    _fill_height_by_column: List[int]
+
     def __init__(self):
-        self._FULL_ROW = int('1111111111', 2)
-        self._WIDTH = 10
-        self._BITMASKS_BY_COLUMN = [int('1000000000', 2) >> i for i in range(self._WIDTH)]
-
-        self._fill_height_by_column = [0] * self._WIDTH
-
         self.grid = [0]
-    
+
+        self._full_row = int('1111111111', 2)
+        self._width = 10
+        self._bitmask_by_column = [int('1000000000', 2) >> i for i in range(self._width)]
+        self._fill_height_by_column = [0] * self._width
+        
 
     def get_fill_height(self) -> int:
         return max(self._fill_height_by_column)
     
 
-    def insert_piece_from_top(self, block: Block, left_most_col: int) -> None:
+    def insert_piece_from_top(self, block: IntBlock, left_most_col: int) -> None:
         while self._get_height() < block.height:
             # grid not height enough
             self._insert_row_at_top()
@@ -32,10 +35,7 @@ class TetrisGridInt:
                 self._insert_row_at_top()
 
         # Find highest fill height among columns the block will occupy
-        max_fill_height = 0
-        for col_offset in range(block.width):
-            grid_col = left_most_col + col_offset
-            max_fill_height = max(max_fill_height, self._fill_height_by_column[grid_col])
+        max_fill_height = max(self._fill_height_by_column[left_most_col:left_most_col + block.width])
         
         # Start checking from the row that's block.height above the highest fill the block will cover
         grid_row = max(0, self._get_height() - max_fill_height - block.height) # Ensure we don't start below grid bottom
@@ -64,9 +64,9 @@ class TetrisGridInt:
                 self._update_fill_heights(bottom_row_idx, rows_removed)
 
 
-    def _insert_block(self, top_left_corner_in_grid: Tuple[int, int], block: Block):
+    def _insert_block(self, top_left_corner_in_grid: Tuple[int, int], block: IntBlock):
         grid_row_idx, grid_col_idx = top_left_corner_in_grid
-        for block_row in block.shape:
+        for block_row in block.coverage:
             # move block n columns to the right into the grid,
             # then store bitwise OR with the grid row into the grid
             block_row_shifted = block_row >> grid_col_idx
@@ -76,7 +76,7 @@ class TetrisGridInt:
             for col_offset in range(block.width):
                 col_idx = grid_col_idx + col_offset
                 # Check if this block row has a '1' in this column
-                if (block_row_shifted & self._BITMASKS_BY_COLUMN[col_idx]) != 0:
+                if (block_row_shifted & self._bitmask_by_column[col_idx]) != 0:
                     # Update max height for this column if current row is higher
                     self._fill_height_by_column[col_idx] = max(
                         self._fill_height_by_column[col_idx],
@@ -97,11 +97,12 @@ class TetrisGridInt:
     def _remove_full_rows(self, bottom_grid_row: int, height_of_block: int) -> int:
         rows_removed = 0
         for row_idx in range(bottom_grid_row, bottom_grid_row - height_of_block, -1):
-            if self.grid[row_idx] == self._FULL_ROW:
+            if self.grid[row_idx] == self._full_row:
                 self.grid.pop(row_idx)
                 rows_removed += 1
 
         return rows_removed
+
 
     def _update_fill_heights(self, bottom_grid_row: int, rows_removed: int) -> None:
         self._fill_height_by_column = [
@@ -109,9 +110,10 @@ class TetrisGridInt:
             for height in self._fill_height_by_column
         ]
 
-    def _is_valid_block_placement(self, top_left_grid_coord: Tuple[int, int], block: Block) -> bool:
-        grid_row_idx, grid_col_idx = top_left_grid_coord
-        for block_row in block.shape:
+
+    def _is_valid_block_placement(self, top_left_corner_in_grid: Tuple[int, int], block: IntBlock) -> bool:
+        grid_row_idx, grid_col_idx = top_left_corner_in_grid
+        for block_row in block.coverage:
             if grid_row_idx >= len(self.grid):
                 # block is trying to be placed (partially) out of bounds
                 return False
@@ -119,7 +121,7 @@ class TetrisGridInt:
             # move block n columns to the right into the grid,
             # then do a bitwise AND with the grid row
             if self.grid[grid_row_idx] & (block_row >> grid_col_idx) != 0:
-                # then there is a collision of pieces when trying to place the block
+                # there is a collision of pieces when trying to place the block
                 return False
             
             grid_row_idx += 1

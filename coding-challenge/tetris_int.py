@@ -2,6 +2,7 @@ import sys
 from blocks import INT_BLOCKS
 from tetris_grid_int import TetrisGridInt
 
+from memory_profiler import profile, memory_usage
 
 def tetris_int(input_line: str) -> int:
     """
@@ -16,7 +17,8 @@ def tetris_int(input_line: str) -> int:
     grid = TetrisGridInt()
     
     for block in input_line.split(','):
-        block_type, left_most_col = block
+        block_type = block[0]
+        left_most_col = int(block[1])
         grid.insert_piece_from_top(INT_BLOCKS[block_type], left_most_col)
     
     return grid.get_fill_height()
@@ -44,10 +46,17 @@ def local_test():
         except EOFError:
             break
 
+
 def test_cases():
-    print(tetris_int("J0,J1,J2,J3"), 16)
+    # print(tetris_int("L0,I3,J8,T6,T1,Q4,Z5,S2,I0,I6,Q4,T0,T7"), 1)
+    # tetris_int("L0,I3,J8,T6,T1,Q4,Z5,S2,I0,I6,Q4,T0,T7")
+    # tetris_int("I2,S0,Q3,I5,J8,S2,T6,S4,S7,J0,T1,J8,T6,I0,T3")
+
+    assert tetris_int("I2,S0,Q3,I5,J8,S2,T6,S4,S7,J0,T1,J8,T6,I0,T3") == 8
+    assert tetris_int(",".join(["Q0"] * 1000)) == 2000
+    
 
 if __name__ == "__main__":
-    main()
+    # main()
     # local_test()
-    # test_cases()
+    test_cases()
