@@ -1,30 +1,7 @@
+import profile
 import sys
-from typing import Dict, List
 from tetris_grid import TetrisGrid
-
-BLOCK_COORDS_BY_PIECE: Dict[str, List[List[bool]]] = {
-    'Q': [[1,1],
-          [1,1]],
-    
-    'Z': [[1,1,0],
-          [0,1,1]],
-    
-    'S': [[0,1,1],
-          [1,1,0]],
-    
-    'T': [[1,1,1],
-          [0,1,0]],
-    
-    'I': [[1,1,1,1]],
-    
-    'L': [[1,0],
-          [1,0],
-          [1,1]],
-    
-    'J': [[0,1],
-          [0,1],
-          [1,1]],
-}
+from blocks import BLOCKS
 
 def tetris(input_line: str) -> int:
     """
@@ -38,10 +15,10 @@ def tetris(input_line: str) -> int:
 
     grid = TetrisGrid()
     
-    for piece in input_line.split(','):
-        piece_type = piece[0]
-        col = int(piece[1])
-        grid.insert_piece_from_top(BLOCK_COORDS_BY_PIECE[piece_type], col)        
+    for block in input_line.split(','):
+        block_type = block[0]
+        left_most_col = int(block[1])
+        grid.insert_piece_from_top(BLOCKS[block_type], left_most_col)   
     
     return grid.get_block_height()
 
@@ -49,7 +26,7 @@ def main():
     try:
         for line in sys.stdin:
             line = line.strip()
-            result = tetris(line)
+            result = tetris(line.strip())
             sys.stdout.write(str(result) + "\n")
     except EOFError:
         sys.stdout.write("EOF detected, exitting from program...")
@@ -61,6 +38,22 @@ def main():
         sys.stdout.write("Exitting from program...")
         sys.exit(0)
 
+def local_test():
+    while True:
+        try:
+            input_line = input()
+            print(tetris(input_line))
+        except EOFError:
+            break
+
+def test_cases():
+    assert tetris("Q0") == 2
+    assert tetris("L0,I3,J8,T6,T1,Q4,Z5,S2,I0,I6,Q4,T0,T7") == 1
+    assert tetris("I2,S0,Q3,I5,J8,S2,T6,S4,S7,J0,T1,J8,T6,I0,T3") == 8
+    assert tetris("I1,I1,I1,I1,I1,I1,I1,I1") == 8
+    assert tetris(",".join(["Q0"] * 1000)) == 2000
 
 if __name__ == "__main__":
-    main()
+    # main()
+    # local_test()
+    test_cases()
