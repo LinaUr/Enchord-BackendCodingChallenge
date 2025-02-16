@@ -181,7 +181,7 @@ pyinstaller --onefile --name tetris tetris.py
 ```
 ...when finished, the executable can be found in `dist/tetris.exe`
 
-In `tests/sample_test.py`, ENTRY_POINT should therefore be set to 
+In `tests/sample_test.py`, `ENTRY_POINT` should therefore be set to 
 ```python
 ENTRY_POINT = "./dist/tetris"
 ```
