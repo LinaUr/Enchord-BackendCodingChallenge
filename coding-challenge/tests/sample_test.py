@@ -23,20 +23,20 @@ class TestCase:
 
 
 def run_test(test_case: TestCase):
-    # # Linux or Mac
-    # p = subprocess.run(
-    #     ["/bin/bash", ENTRY_POINT],
-    #     input=test_case.sample_input,
-    #     capture_output=True,
-    # )
-
-    # Windows
-    absPath = os.path.abspath("coding-challenge/dist/tetris.exe")
+    # Linux or Mac
     p = subprocess.run(
-        ["cmd.exe", "/c", absPath],
+        ["/bin/bash", ENTRY_POINT],
         input=test_case.sample_input,
         capture_output=True,
     )
+
+    # # Windows
+    # absPath = os.path.abspath("coding-challenge/dist/tetris.exe")
+    # p = subprocess.run(
+    #     ["cmd.exe", "/c", absPath],
+    #     input=test_case.sample_input,
+    #     capture_output=True,
+    # )
 
     output = [int(line) for line in p.stdout.splitlines()]
 

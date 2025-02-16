@@ -1,5 +1,72 @@
+# Submission
+
+> **NOTE:** I personally developed and tested this solution on **Windows**.
+
+## Setup
+
+Create a virtual environment and activate it:
+```bash
+python -m venv .venv
+source .venv/bin/activate
+```
+
+> The virtual environment must *stay activated* for the rest of the commands to work.
+
+Install the dependencies:
+```bash
+pip install -r requirements.txt
+```
+
+Build the executable:
+```bash
+pyinstaller --onefile --name tetris tetris.py
+```
+...when finished, the executable can be found in `dist/tetris.exe`. In `tests/sample_test.py`, `ENTRY_POINT` should therefore be set to: 
+```python
+ENTRY_POINT = "./dist/tetris"
+```
+
+### Notes on the Setup:
+
+If on **Windows**, activate the virtual environment by running:
+```shell
+.venv\Scripts\activate
+```
+
+I personally developed and tested this solution on Windows using this in `tests/sample_test.py`:
+```python
+    p = subprocess.run(
+        ["cmd.exe", "/c", "dist/tetris.exe"],
+        input=test_case.sample_input,
+        capture_output=True,
+    )
+```
+
+## Notes on the Solution
+
+### Solution Ideas
+
+**Solution 1: Using a list of lists of booleans for the grid**\
+I first implemented the solution using lists of booleans to represent the grid (see `tetris_grid_using_lists.py`).
+This worked very well for the small inputs, and also reasonably well for larger inputs.
+
+**Solution 2: Using a list of integers for the grid**\
+Since the grid is represented by booleans, the idea of using bit-strings (or essentially 10-bit numbers) came to my mind. Since python doesn't support smaller number data types than `integer` by default, I used a list of integers, where each integer represented a row in the grid, and each of the right-most 10 bits in the integer represented a column in the row.
+This didn't cause any significant runtime or memory usage, but you could see differences when trying larger inputs.
+
+
+### Final solution
+
+I ended up making the tetris implementation using the integer-solution, because of its better performance and memory usage.
+However, I also included the list-of-lists-of-booleans-implementation as part of my submission, because I find it to be more intuitive to read and understand and thus maintain, so I'd like to show it here as well.
+
+Just as an FYI: I stayed within the requested time-limit for spending time on this coding task, which included: implementing, testing and doing some very basic performance measurements on the two solutions.
+
+---
+---
+---
+
 # Tetris programming challenge
-For setup instructions and notes on the Solution, see the bottom of this file at [Solution](#solution).
 
 ## Instructions
 
@@ -157,70 +224,3 @@ The solution will be evaluated on the following criteria:
 - **Algorithmic complexity**: how does the performance of the submission scale with
   regards to its input
 - **Efficiency**: how efficient is the solution. Our test suite includes test cases that might not fit entirely into memory. The solution is expected to handle multi-gigabyte inputs without running itself out of memory.
-
-
-# Solution
-## Setup
-
-Create a virtual environment activate it:
-```bash
-python -m venv .venv
-source .venv/bin/activate
-```
-
-The virtual environment must stay activated for the rest of the commands to work.
-
-Install the dependencies:
-```bash
-pip install -r requirements.txt
-```
-
-Build the executable:
-```bash
-pyinstaller --onefile --name tetris tetris.py
-```
-...when finished, the executable can be found in `dist/tetris.exe`
-
-In `tests/sample_test.py`, `ENTRY_POINT` should therefore be set to 
-```python
-ENTRY_POINT = "./dist/tetris"
-```
-
-### Notes on the Setup:
-
-If on Windows, activate the virtual environment by running:
-```shell
-.venv\Scripts\activate
-```
-
-I personally developed and tested this solution on Windows using...
-```python
-    p = subprocess.run(
-        ["cmd.exe", "/c", "dist/tetris.exe"],
-        input=test_case.sample_input,
-        capture_output=True,
-    )
-```
-
-...so if you are using Linux or Mac and something doesn't work properly, you will need to modify the `ENTRY_POINT` in `tests/sample_test.py` accordingly.
-
-
-## Notes on the Solution
-
-### Solution Ideas
-
-**Solution 1: Using a list of lists of booleans for the grid**\
-I first implemented the solution using lists of booleans to represent the grid (see `tetris_grid_using_lists.py`).
-This worked very well for the small inputs, and also reasonably well for larger inputs.
-
-**Solution 2: Using a list of integers for the grid**\
-Since the grid is represented by booleans, the idea of using bit-strings (or essentially 10-bit numbers) came to my mind. Since python doesn't support smaller number data types than `integer` by default, I used a list of integers, where each integer represented a row in the grid, and each of the right-most 10 bits in the integer represented a column in the row.
-This didn't cause any significant runtime or memory usage, but you could see differences when trying larger inputs.
-
-
-### Final solution
-
-I ended up making the tetris implementation using the integer-solution, because of its better performance and memory usage.
-However, I also included the list-of-lists-of-booleans-implementation as part of my submission, because I find it to be more intuitive to read and understand and thus maintain, so I'd like to show it here as well.
-
-Just as an FYI: I stayed within the requested time-limit for spending time on this coding task, which included: implementing, testing and doing some very basic performance measurements on the two solutions.
