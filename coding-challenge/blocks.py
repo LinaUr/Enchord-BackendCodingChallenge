@@ -1,67 +1,6 @@
 from dataclasses import dataclass
-from typing import Dict, List
-from numpy import ubyte, ushort
+from typing import Dict, List, Union
 
-@dataclass
-class ShortBlock:
-    coverage: List[ushort]
-    width: ubyte
-    height: ubyte
-
-"""
-Block coordinates are stored as integers for efficiency.
-Blocks are stored as if they were at the far left of the grid.
-"""
-SHORT_BLOCKS: Dict[str, ShortBlock] = {
-    'Q': ShortBlock(
-        coverage=[ushort(int('11', 2)) << 8,    # 0b1100000000
-                  ushort(int('11', 2)) << 8],   # 0b1100000000
-        width=2,
-        height=2
-    ),
-    'Z': ShortBlock(
-        coverage=[ushort(int('110', 2)) << 7,   # 0b1100000000
-                  ushort(int('011', 2)) << 7],  # 0b0110000000
-        width=3,
-        height=2
-    ),
-    
-    'S': ShortBlock(
-        coverage=[ushort(int('011', 2)) << 7,   # 0b0110000000
-                  ushort(int('110', 2)) << 7],  # 0b1100000000
-        width=3,
-        height=2
-    ),
-    
-    'T': ShortBlock(
-        coverage=[ushort(int('111', 2)) << 7,   # 0b1110000000
-                  ushort(int('010', 2)) << 7],  # 0b0100000000
-        width=3,
-        height=2
-    ),
-    
-    'I': ShortBlock(
-        coverage=[ushort(int('1111', 2)) << 6], # 0b1111000000
-        width=4,
-        height=1
-    ),
-    
-    'L': ShortBlock(
-        coverage=[ushort(int('10', 2)) << 8,    # 0b1000000000
-                  ushort(int('10', 2)) << 8,    # 0b1000000000
-                  ushort(int('11', 2)) << 8],   # 0b1100000000
-        width=2,
-        height=3
-    ),
-    
-    'J': ShortBlock(
-        coverage=[ushort(int('01', 2)) << 8,    # 0b0100000000
-                  ushort(int('01', 2)) << 8,    # 0b0100000000
-                  ushort(int('11', 2)) << 8],   # 0b1100000000
-        width=2,
-        height=3
-    ),
-}
 
 @dataclass
 class IntBlock:
@@ -70,10 +9,10 @@ class IntBlock:
     height: int
 
 """
-Block coordinates are stored as integers for efficiency.
-Blocks are stored as if they were at the far left of the grid.
+Block coverage is stored as integers for memory and runtime efficiency.
+Blocks are stored in binary format as if they were placed at the far left of the grid.
 """
-INT_BLOCKS: Dict[str, IntBlock] = {
+BLOCK_USING_INTS: Dict[str, IntBlock] = {
     'Q': IntBlock(
         coverage=[int('11', 2) << 8,    # 0b1100000000
                   int('11', 2) << 8],   # 0b1100000000
@@ -124,18 +63,18 @@ INT_BLOCKS: Dict[str, IntBlock] = {
     ),
 }
 
+
 @dataclass
-class Block:
+class ListBlock:
     coverage: List[List[bool]]
     width: int
     height: int
 
 """
-Block coordinates are stored as integers for efficiency.
-Blocks are stored as if they were at the far left of the grid.
+Block coverage is stored as lists of lists of booleans for readability.
 """
-BLOCKS: Dict[str, Block] = {
-    'Q': Block(
+BLOCKS_USING_LISTS: Dict[str, ListBlock] = {
+    'Q': ListBlock(
         coverage=[
             [1, 1],
             [1, 1]
@@ -143,7 +82,7 @@ BLOCKS: Dict[str, Block] = {
         width=2,
         height=2
     ),
-    'Z': Block(
+    'Z': ListBlock(
         coverage=[
             [1, 1, 0],
             [0, 1, 1]
@@ -152,7 +91,7 @@ BLOCKS: Dict[str, Block] = {
         height=2
     ),
     
-    'S': Block(
+    'S': ListBlock(
         coverage=[
             [0, 1, 1],
             [1, 1, 0]
@@ -161,7 +100,7 @@ BLOCKS: Dict[str, Block] = {
         height=2
     ),
     
-    'T': Block(
+    'T': ListBlock(
         coverage=[
             [1, 1, 1],
             [0, 1, 0]
@@ -170,7 +109,7 @@ BLOCKS: Dict[str, Block] = {
         height=2
     ),
     
-    'I': Block(
+    'I': ListBlock(
         coverage=[
             [1, 1, 1, 1]
         ],
@@ -178,7 +117,7 @@ BLOCKS: Dict[str, Block] = {
         height=1
     ),
     
-    'L': Block(
+    'L': ListBlock(
         coverage=[
             [1, 0],
             [1, 0],
@@ -188,7 +127,7 @@ BLOCKS: Dict[str, Block] = {
         height=3
     ),
     
-    'J': Block(
+    'J': ListBlock(
         coverage=[
             [0, 1],
             [0, 1],
@@ -198,3 +137,6 @@ BLOCKS: Dict[str, Block] = {
         height=3
     ),
 }
+
+
+BlockType = Union[IntBlock, ListBlock]

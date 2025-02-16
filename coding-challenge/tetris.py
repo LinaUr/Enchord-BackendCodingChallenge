@@ -1,32 +1,34 @@
-import profile
 import sys
+from typing import Dict
+from blocks import BLOCK_USING_INTS, BlockType
 from tetris_grid import TetrisGrid
-from blocks import BLOCKS
+from tetris_grid_using_ints import TetrisGridUsingInts
 
-def tetris(input_line: str) -> int:
+def tetris(grid: TetrisGrid, block_types: Dict[str, BlockType], input_line: str) -> int:
     """
     Tetrises the input sequence of pieces.
     Returns the filled height of the grid.
     """
 
-    # If the input line is empty (meaning no block placed), return 0.
     if not input_line:
+        # input line is empty, meaning no block placed
         return 0
 
-    grid = TetrisGrid()
-    
     for block in input_line.split(','):
         block_type = block[0]
-        left_most_col = int(block[1])
-        grid.insert_piece_from_top(BLOCKS[block_type], left_most_col)   
+        left_most_col = int(block[1])        
+        grid.insert_block_from_top(block_types[block_type], left_most_col)
     
-    return grid.get_block_height()
+    return grid.get_fill_height()
+
 
 def main():
+    # Change these two lines to switch between the two grid implementations
+    grid, block_types = TetrisGridUsingInts(), BLOCK_USING_INTS
+    
     try:
         for line in sys.stdin:
-            line = line.strip()
-            result = tetris(line.strip())
+            result = tetris(grid, block_types, line.strip())
             sys.stdout.write(str(result) + "\n")
     except EOFError:
         sys.stdout.write("EOF detected, exitting from program...")
@@ -38,22 +40,6 @@ def main():
         sys.stdout.write("Exitting from program...")
         sys.exit(0)
 
-def local_test():
-    while True:
-        try:
-            input_line = input()
-            print(tetris(input_line))
-        except EOFError:
-            break
-
-def test_cases():
-    assert tetris("Q0") == 2
-    assert tetris("L0,I3,J8,T6,T1,Q4,Z5,S2,I0,I6,Q4,T0,T7") == 1
-    assert tetris("I2,S0,Q3,I5,J8,S2,T6,S4,S7,J0,T1,J8,T6,I0,T3") == 8
-    assert tetris("I1,I1,I1,I1,I1,I1,I1,I1") == 8
-    assert tetris(",".join(["Q0"] * 1000)) == 2000
 
 if __name__ == "__main__":
-    # main()
-    # local_test()
-    test_cases()
+    main()

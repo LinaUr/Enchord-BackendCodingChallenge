@@ -8,6 +8,7 @@ please
     Windows you will need to modify the `subprocess.run` command accordingly.
 """
 
+import os
 import subprocess
 from dataclasses import dataclass
 from typing import Iterable
@@ -22,8 +23,17 @@ class TestCase:
 
 
 def run_test(test_case: TestCase):
+    # # Linux or Mac
+    # p = subprocess.run(
+    #     ["/bin/bash", ENTRY_POINT],
+    #     input=test_case.sample_input,
+    #     capture_output=True,
+    # )
+
+    # Windows
+    absPath = os.path.abspath("coding-challenge/dist/tetris.exe")
     p = subprocess.run(
-        ["/bin/bash", ENTRY_POINT],
+        ["cmd.exe", "/c", absPath],
         input=test_case.sample_input,
         capture_output=True,
     )
@@ -38,6 +48,7 @@ def run_test(test_case: TestCase):
 if __name__ == "__main__":
     test_cases = [
         TestCase("simple test", b"Q0", 2),
+        TestCase("custom test 1", "Q0,Q1,Q2".encode("utf-8"), 12),
         TestCase("Many blocks test", ",".join(["Q0"] * 50).encode("utf-8"), 100),
     ]
     for test_case in test_cases:
